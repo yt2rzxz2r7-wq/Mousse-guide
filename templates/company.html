@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Entreprise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-1:#0b1220; --bg-2:#0a2a3d;
+      --card: rgba(255,255,255,0.94);
+      --shadow: 0 18px 45px rgba(0,0,0,0.22);
+      --shadow-soft: 0 10px 26px rgba(0,0,0,0.14);
+      --radius: 18px;
+    }
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(1200px 500px at 15% 10%, rgba(59,130,246,0.25), transparent 60%),
+        radial-gradient(900px 500px at 80% 0%, rgba(34,197,94,0.18), transparent 60%),
+        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    }
+    .topbar{
+      position: sticky; top:0; z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(10,18,32,0.55);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+    .brand{ color: rgba(255,255,255,0.94); font-weight: 900; }
+    .subbrand{ color: rgba(255,255,255,0.72); font-size: .92rem; }
+
+    .cardx{
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid rgba(15,23,42,0.10);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+    .cardx-head{
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(15,23,42,0.10);
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+    }
+    .cardx-body{ padding: 16px 18px 20px 18px; }
+
+    .pill{
+      display:inline-flex; align-items:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,0.12);
+      background: rgba(255,255,255,0.6);
+      font-size: .78rem;
+      font-weight: 900;
+      color: rgba(13,18,32,0.75);
+      white-space: nowrap;
+    }
+
+    /* logo plus gros et sous le nom */
+    .logo-big{
+      width: 100%;
+      height: 120px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(15,23,42,0.10);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: var(--shadow-soft);
+      margin-top: 12px;
+      display:none;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 160px 1fr;
+      gap: 10px 12px;
+      align-items:start;
+    }
+    .k{ font-weight: 950; color: rgba(13,18,32,0.72); }
+    .v{ color: rgba(13,18,32,0.92); white-space: pre-wrap; }
+
+    a.link{
+      color: #1d4ed8;
+      text-decoration: none;
+      font-weight: 900;
+    }
+    a.link:hover{ text-decoration: underline; }
+
+    .corner-logos{
+      position: fixed; right: 18px; bottom: 18px;
+      display: flex; gap: 14px; align-items: center;
+      z-index: 60; padding: 14px 16px; border-radius: 14px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(10px);
+    }
+    .corner-logos img{
+      height: 56px; width: auto; object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="container py-3 d-flex justify-content-between align-items-center">
+      <div>
+        <div class="brand" id="title">Entreprise</div>
+        <div class="subbrand">
+          <a id="backLink" href="/" class="text-decoration-none" style="color:rgba(255,255,255,0.75)">← Retour</a>
+        </div>
+      </div>
+      <span class="pill">Fiche entreprise</span>
+    </div>
+  </div>
+
+  <div class="corner-logos" aria-label="Logos partenaires">
+    <img src="/static/IMT_MinesAlbi_Logo.png" alt="IMT Mines Albi" onerror="this.style.display='none'">
+    <img src="/static/SIOEN.png" alt="SIOEN" onerror="this.style.display='none'">
+  </div>
+
+  <div class="container py-4">
+    <div class="cardx">
+      <div class="cardx-head">
+        <div style="width:100%;">
+          <div style="font-weight:950;font-size:1.25rem" id="name">Chargement…</div>
+          <div class="subbrand" id="place"></div>
+          <img id="logo" class="logo-big" alt="Logo entreprise" />
+        </div>
+        <span class="pill" id="typePill" style="display:none"></span>
+      </div>
+
+      <div class="cardx-body">
+        <!-- description entreprise puis infos utiles -->
+        <div class="k">Description</div>
+        <div class="v mb-3" id="desc">—</div>
+
+        <div class="grid2" id="grid"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const API = "/api";
+  const companyId = "{{ company_id }}";
+
+  const params = new URLSearchParams(window.location.search);
+  const back = params.get("back"); // on vient de method.html -> back = url method
+
+  const backLink = document.getElementById("backLink");
+  const title = document.getElementById("title");
+  const nameEl = document.getElementById("name");
+  const placeEl = document.getElementById("place");
+  const logoEl = document.getElementById("logo");
+  const typePill = document.getElementById("typePill");
+  const descEl = document.getElementById("desc");
+  const grid = document.getElementById("grid");
+
+  function safe(v){
+    if (v === null || v === undefined) return "—";
+    const s = String(v).trim();
+    return s.length ? s : "—";
+  }
+
+  function addRow(k, v, isLink=false){
+    const dk = document.createElement("div");
+    dk.className = "k";
+    dk.textContent = k;
+
+    const dv = document.createElement("div");
+    dv.className = "v";
+
+    if(isLink && v && v !== "—"){
+      const a = document.createElement("a");
+      a.className = "link";
+      a.href = v;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = v;
+      dv.appendChild(a);
+    }else{
+      dv.textContent = safe(v);
+    }
+
+    grid.appendChild(dk);
+    grid.appendChild(dv);
+  }
+
+  function addRowMail(k, mail){
+    const dk = document.createElement("div");
+    dk.className = "k";
+    dk.textContent = k;
+
+    const dv = document.createElement("div");
+    dv.className = "v";
+
+    const m = safe(mail);
+    if(m !== "—"){
+      const a = document.createElement("a");
+      a.className = "link";
+      a.href = "mailto:" + m;
+      a.textContent = m;
+      dv.appendChild(a);
+    } else {
+      dv.textContent = "—";
+    }
+
+    grid.appendChild(dk);
+    grid.appendChild(dv);
+  }
+
+  function addRowPhone(k, phone){
+    const dk = document.createElement("div");
+    dk.className = "k";
+    dk.textContent = k;
+
+    const dv = document.createElement("div");
+    dv.className = "v";
+
+    const p = safe(phone);
+    if(p !== "—"){
+      const a = document.createElement("a");
+      a.className = "link";
+      a.href = "tel:" + p.replace(/\s+/g,'');
+      a.textContent = p;
+      dv.appendChild(a);
+    } else {
+      dv.textContent = "—";
+    }
+
+    grid.appendChild(dk);
+    grid.appendChild(dv);
+  }
+
+  async function load(){
+    // retour => method (pas index)
+    backLink.href = back ? back : "/";
+
+    const r = await fetch(`${API}/companies/${encodeURIComponent(companyId)}`);
+    if(!r.ok){
+      title.textContent = "Entreprise introuvable";
+      nameEl.textContent = "—";
+      return;
+    }
+    const c = await r.json();
+
+    nameEl.textContent = safe(c.name);
+    const loc = [c.city, c.country].filter(Boolean).join(" • ");
+    placeEl.textContent = loc || "";
+
+    if(c.company_type){
+      typePill.style.display = "inline-flex";
+      typePill.textContent = String(c.company_type).toUpperCase();
+    }
+
+    // logo plus gros en dessous
+    if(c.logo_path){
+      logoEl.src = "/static/" + c.logo_path;
+      logoEl.style.display = "block";
+      logoEl.onerror = () => { logoEl.style.display = "none"; };
+    }
+
+    // description entreprise = notes
+    descEl.textContent = safe(c.notes);
+
+    // infos utiles
+    grid.innerHTML = "";
+    addRow("Adresse", c.address);
+    addRow("Ville / Pays", loc || "—");
+    addRow("Site", c.website, true);
+    addRowMail("Email", c.email);
+    addRowPhone("Téléphone", c.phone);
+  }
+
+  load();
+</script>
+</body>
+</html>

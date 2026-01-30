@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fiche mousse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-1:#0b1220; --bg-2:#0a2a3d;
+      --card: rgba(255,255,255,0.94);
+      --shadow: 0 18px 45px rgba(0,0,0,0.22);
+      --shadow-soft: 0 10px 26px rgba(0,0,0,0.14);
+      --radius: 18px;
+    }
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(1200px 500px at 15% 10%, rgba(59,130,246,0.25), transparent 60%),
+        radial-gradient(900px 500px at 80% 0%, rgba(34,197,94,0.18), transparent 60%),
+        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    }
+    .topbar{
+      position: sticky; top:0; z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(10,18,32,0.55);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+    .brand{ color: rgba(255,255,255,0.94); font-weight: 850; }
+    .subbrand{ color: rgba(255,255,255,0.70); font-size: .92rem; }
+
+    .cardx{
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid rgba(15,23,42,0.10);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+    .cardx-head{
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(15,23,42,0.10);
+    }
+    .cardx-body{ padding: 16px 18px; }
+
+    .badge-code{
+      display:inline-flex; align-items:center;
+      padding:6px 10px; border-radius:999px;
+      font-weight:900; font-size:.78rem; letter-spacing:.06em; text-transform:uppercase;
+      background: rgba(59,130,246,0.12);
+      color: #1d4ed8;
+    }
+    .title{ font-weight:950; font-size:1.25rem; margin:10px 0 0 0; color: rgba(13,18,32,0.92); }
+
+    /* Photo plus grosse sous le nom */
+    .photo{
+      margin-top: 12px;
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      border-radius: 16px;
+      background: #e9eef6;
+      border: 1px solid rgba(15,23,42,0.12);
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* KV sans titres */
+    .kv{
+      display:grid;
+      grid-template-columns: 220px 1fr;
+      gap: 10px 14px;
+      align-items:start;
+    }
+    .k{ font-weight: 950; color: rgba(13,18,32,0.78); }
+    .v{ color: rgba(13,18,32,0.92); white-space: pre-wrap; }
+
+    .pill{
+      border: 1px solid rgba(15,23,42,0.14);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.75);
+    }
+    .btn-main{
+      font-weight: 900;
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+
+    .corner-logos{
+      position: fixed; right: 18px; bottom: 18px;
+      display: flex; gap: 14px; align-items: center;
+      z-index: 60; padding: 14px 16px; border-radius: 14px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(10px);
+    }
+    .corner-logos img{
+      height: 56px; width: auto; object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+    }
+
+    @media (max-width: 991px){
+      .kv{ grid-template-columns: 1fr; }
+      .photo{ height: 200px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="container py-3 d-flex justify-content-between align-items-center">
+      <div>
+        <div class="brand">Fiche technique</div>
+        <div class="subbrand"><a href="/" class="text-decoration-none" style="color:rgba(255,255,255,0.75)">← Retour catalogue</a></div>
+      </div>
+      <div class="badge-code" id="foamCode">—</div>
+    </div>
+  </div>
+
+  <div class="corner-logos" aria-label="Logos partenaires">
+    <img src="/static/IMT_MinesAlbi_Logo.png" alt="IMT Mines Albi" onerror="this.style.display='none'">
+    <img src="/static/SIOEN.png" alt="SIOEN" onerror="this.style.display='none'">
+  </div>
+
+  <div class="container py-4">
+    <div class="row g-3">
+      <!-- GAUCHE -->
+      <div class="col-12 col-lg-8">
+        <div class="cardx">
+          <div class="cardx-head">
+            <h1 class="title" id="foamName">Chargement…</h1>
+            <img id="foamImage" class="photo" src="" alt="Mousse"
+                 onerror="this.src='https://via.placeholder.com/1200x600?text=Mousse'">
+          </div>
+
+          <div class="cardx-body">
+            <div class="kv" id="kvBox"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DROITE -->
+      <div class="col-12 col-lg-4">
+        <div class="cardx p-3">
+          <div style="font-weight:950;font-size:1.05rem;margin-bottom:10px;" id="qtyTitle">Quantité à traiter</div>
+
+          <div class="d-flex gap-2 mb-3">
+            <label class="pill d-flex align-items-center gap-2" style="cursor:pointer;">
+              <input type="radio" name="mode" value="mass" checked>
+              <span>Masse (kg)</span>
+            </label>
+            <label class="pill d-flex align-items-center gap-2" style="cursor:pointer;">
+              <input type="radio" name="mode" value="volume">
+              <span>Volume (m³)</span>
+            </label>
+          </div>
+
+          <div class="mb-3">
+            <input id="qtyInput" class="form-control form-control-lg" type="number" min="0" step="any" placeholder="Entrer une valeur">
+            <div class="form-text" id="unitHint">Unité : kg</div>
+          </div>
+
+          <button id="btnCalc" class="btn btn-primary w-100 btn-main">Voir les méthodes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const foamCode = "{{ foam_code }}";
+  const API = "/api";
+
+  const elCode = document.getElementById("foamCode");
+  const elName = document.getElementById("foamName");
+  const elImg  = document.getElementById("foamImage");
+  const kvBox  = document.getElementById("kvBox");
+
+  const qtyTitle = document.getElementById("qtyTitle");
+  const qtyInput = document.getElementById("qtyInput");
+  const unitHint = document.getElementById("unitHint");
+  const btnCalc = document.getElementById("btnCalc");
+
+  function safe(v){
+    if (v === null || v === undefined) return "—";
+    const s = String(v).trim();
+    return s.length ? s : "—";
+  }
+
+  function getMode(){
+    return document.querySelector("input[name='mode']:checked").value;
+  }
+  function updateUnitHint(){
+    const mode = getMode();
+    unitHint.textContent = "Unité : " + (mode === "mass" ? "kg" : "m³");
+  }
+  document.addEventListener("change", (e) => {
+    if (e.target.name === "mode") updateUnitHint();
+  });
+
+  function addKV(label, value){
+    const k = document.createElement("div");
+    k.className = "k";
+    k.textContent = label;
+
+    const v = document.createElement("div");
+    v.className = "v";
+    v.textContent = safe(value);
+
+    kvBox.appendChild(k);
+    kvBox.appendChild(v);
+  }
+
+  function compositionToText(items){
+    if (!items || !items.length) return "—";
+
+    // group by category
+    const byCat = {};
+    items.forEach(it => {
+      const cat = it.category || "Autres";
+      byCat[cat] = byCat[cat] || [];
+      byCat[cat].push(it);
+    });
+
+    // deterministic ordering: keep insertion but make stable by key
+    const cats = Object.keys(byCat);
+
+    let out = "";
+    cats.forEach((cat, idx) => {
+      out += `${cat}:\n`;
+      byCat[cat].forEach(it => {
+        const main = [it.component, it.typical].filter(x => x && String(x).trim().length).join(" — ");
+        const notes = it.notes && String(it.notes).trim().length ? ` (${it.notes})` : "";
+        out += `- ${main || safe(it.component)}${notes}\n`;
+      });
+      if (idx < cats.length - 1) out += "\n";
+    });
+    return out.trim();
+  }
+
+  function propertiesToText(foam){
+    const lines = [];
+
+    // densité (champ principal)
+    if (foam.density_kg_m3 !== null && foam.density_kg_m3 !== undefined) {
+      lines.push(`Densité : ${foam.density_kg_m3} kg/m³`);
+    }
+
+    if (foam.physical_properties && foam.physical_properties.length){
+      foam.physical_properties.forEach(p => {
+        const name = p.property || "Propriété";
+        const val = [p.value, p.unit].filter(Boolean).join(" ");
+        const std = p.standard ? ` (norme: ${p.standard})` : "";
+        const notes = p.notes ? ` — ${p.notes}` : "";
+        lines.push(`${name} : ${val || "—"}${std}${notes}`);
+      });
+    }
+
+    return lines.length ? lines.join("\n") : "—";
+  }
+
+  function hazardsToText(haz){
+    const use = haz?.use || [];
+    const rec = haz?.recycling || [];
+
+    const block = (title, arr) => {
+      if (!arr.length) return `${title}:\n- —`;
+      const lines = arr.map(h => `- ${(h.hazard || "—")}${h.mitigation ? " → " + h.mitigation : ""}`);
+      return `${title}:\n${lines.join("\n")}`;
+    };
+
+    return [block("Usage", use), block("Recyclage", rec)].join("\n\n");
+  }
+
+  function renderTech(foam){
+    elCode.textContent = foam.code || foamCode;
+    elName.textContent = foam.name || foamCode;
+
+    qtyTitle.textContent = `Quantité de ${foam.name || foam.code || "mousse"} à traiter`;
+
+    const imgPath = foam.image_path ? ("/static/" + foam.image_path) : "";
+    elImg.src = imgPath || "https://via.placeholder.com/1200x600?text=Mousse";
+
+    kvBox.innerHTML = "";
+
+    // ORDRE STRICT (sans sous-titres)
+    addKV("Famille", foam.family);
+    addKV("Aspect", foam.visual_aspect);
+    addKV("Composition", compositionToText(foam.composition_items));
+    addKV("Propriétés physiques", propertiesToText(foam));
+    addKV("Dangers", hazardsToText(foam.hazards));
+    addKV("Filières de réutilisation", foam.reuse_routes);
+  }
+
+  btnCalc.addEventListener("click", () => {
+    const mode = getMode();
+    const qty = parseFloat(qtyInput.value);
+    if (!isFinite(qty) || qty <= 0){
+      qtyInput.focus();
+      return;
+    }
+    const url = `/foam/${encodeURIComponent(foamCode)}/methods?mode=${encodeURIComponent(mode)}&qty=${encodeURIComponent(qty)}`;
+    window.location.href = url;
+  });
+
+  async function load(){
+    const res = await fetch(`${API}/foam-types/${encodeURIComponent(foamCode)}`);
+    if(!res.ok){
+      elName.textContent = "Mousse introuvable";
+      return;
+    }
+    const foam = await res.json();
+    renderTech(foam);
+    updateUnitHint();
+  }
+
+  load();
+</script>
+</body>
+</html>
